@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/bkojha74/mocro-service/auth-handler/controller"
+	"github.com/bkojha74/micro-service/auth-handler/controller"
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger"
 )

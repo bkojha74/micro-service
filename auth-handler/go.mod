@@ -1,4 +1,4 @@
-module github.com/bkojha74/mocro-service/auth-handler
+module github.com/bkojha74/micro-service/auth-handler
 
 go 1.22.3
 

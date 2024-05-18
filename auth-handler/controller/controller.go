@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bkojha74/mocro-service/auth-handler/models"
+	"github.com/bkojha74/micro-service/auth-handler/models"
 	"github.com/dgrijalva/jwt-go"
 )
 

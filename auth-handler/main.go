@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/bkojha74/mocro-service/auth-handler/docs"
-	"github.com/bkojha74/mocro-service/auth-handler/helper"
-	route "github.com/bkojha74/mocro-service/auth-handler/router"
+	_ "github.com/bkojha74/micro-service/auth-handler/docs"
+	"github.com/bkojha74/micro-service/auth-handler/helper"
+	route "github.com/bkojha74/micro-service/auth-handler/router"
 )
 
 // @title File Management API

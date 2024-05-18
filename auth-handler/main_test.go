@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/bkojha74/mocro-service/auth-handler/models"
-	"github.com/bkojha74/mocro-service/auth-handler/router"
+	"github.com/bkojha74/micro-service/auth-handler/models"
+	"github.com/bkojha74/micro-service/auth-handler/router"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 )

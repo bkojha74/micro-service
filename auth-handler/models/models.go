@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/bkojha74/mocro-service/auth-handler/helper"
+	"github.com/bkojha74/micro-service/auth-handler/helper"
 	"github.com/dgrijalva/jwt-go"
 )
 
