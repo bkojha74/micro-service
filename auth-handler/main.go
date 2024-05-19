@@ -9,7 +9,7 @@ import (
 	route "github.com/bkojha74/micro-service/auth-handler/router"
 )
 
-// @title File Management API
+// @title Authentication Management API
 // @version 1.0
 // @description This is a sample server for file management.
 // @termsOfService http://swagger.io/terms/
