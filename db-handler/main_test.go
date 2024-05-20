@@ -172,11 +172,10 @@ func TestUpdateUserHandler(t *testing.T) {
 func TestDeleteUserHandler(t *testing.T) {
 	mockUserModel := &MockUserModel{
 		DeleteUserFunc: func(username string) error {
-			if username == "erroruser" {
-				return errors.New("error deleting user")
-			}
-			if username == "notfound" {
+			if username == "nonexistentuser" {
 				return errors.New("user not found")
+			} else if username == "erroruser" {
+				return errors.New("internal server error")
 			}
 			return nil
 		},
@@ -190,21 +189,37 @@ func TestDeleteUserHandler(t *testing.T) {
 		expectedCode int
 		expectedBody string
 	}{
-		{"Valid User", "testuser", http.StatusOK, "User deleted successfully"},
-		{"User Not Found", "notfound", http.StatusNotFound, "User not found"},
-		{"Server Error", "erroruser", http.StatusInternalServerError, "Error deleting user"},
+		{
+			name:         "Valid User",
+			username:     "validuser",
+			expectedCode: http.StatusOK,
+			expectedBody: "User deleted successfully",
+		},
+		{
+			name:         "User Not Found",
+			username:     "nonexistentuser",
+			expectedCode: http.StatusNotFound,
+			expectedBody: "User not found",
+		},
+		{
+			name:         "Server Error",
+			username:     "erroruser",
+			expectedCode: http.StatusInternalServerError,
+			expectedBody: "Error deleting user",
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req, _ := http.NewRequest("DELETE", "/users/"+tt.username, nil)
 			rr := httptest.NewRecorder()
-			router := mux.NewRouter()
-			router.HandleFunc("/users/{username}", handler.DeleteUserHandler)
-			router.ServeHTTP(rr, req)
+			handlerFunc := http.HandlerFunc(handler.DeleteUserHandler)
+			handlerFunc.ServeHTTP(rr, req)
+
+			actualBody := strings.TrimSpace(rr.Body.String())
 
 			assert.Equal(t, tt.expectedCode, rr.Code)
-			assert.Equal(t, tt.expectedBody, strings.TrimSpace(rr.Body.String()))
+			assert.Equal(t, tt.expectedBody, actualBody)
 		})
 	}
 }

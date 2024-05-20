@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/bkojha74/micro-service/db-handler/helper"
 	"github.com/bkojha74/micro-service/db-handler/models"
@@ -111,14 +112,17 @@ func (h *Handler) UpdateUserHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {string} string "Error deleting user"
 // @Router /users/{username} [delete]
 func (h *Handler) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	username := vars["username"]
-
+	username := strings.TrimPrefix(r.URL.Path, "/users/")
 	err := h.UserModel.DeleteUser(username)
 	if err != nil {
-		http.Error(w, "Error deleting user", http.StatusInternalServerError)
+		if err.Error() == "user not found" {
+			http.Error(w, "User not found", http.StatusNotFound)
+		} else {
+			http.Error(w, "Error deleting user", http.StatusInternalServerError)
+		}
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User deleted successfully"))
 }
