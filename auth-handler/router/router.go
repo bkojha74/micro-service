@@ -12,6 +12,7 @@ func GetRouter() *mux.Router {
 
 	// token handlers
 	route.HandleFunc("/generate-token", controller.GenerateToken).Methods("POST")
+	route.HandleFunc("/verify-token", controller.VerifyToken).Methods("GET")
 
 	// Serve Swagger UI
 	route.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)

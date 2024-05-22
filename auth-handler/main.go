@@ -12,6 +12,9 @@ import (
 // @title Authentication Management API
 // @version 1.0
 // @description This is a sample server for file management.
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
