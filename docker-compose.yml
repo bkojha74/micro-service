@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  auth-handler:
+    build: ./auth-handler
+    container_name: auth-handler
+    ports:
+      - "8081:8081"
+    networks:
+      - my-network
+
+  db-handler:
+    build: ./db-handler
+    container_name: db-handler
+    environment:
+      - MONGO_URI=mongodb://mongodb:mongodb@mongodb:27017
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongo
+    networks:
+      - my-network
+
+  file-handler:
+    build: ./file-handler
+    container_name: file-handler
+    ports:
+      - "8083:8083"
+    networks:
+      - my-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongodb
+      - MONGO_INITDB_ROOT_PASSWORD=mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - my-network
+    volumes:
+      - mongo-data:/data/db
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
