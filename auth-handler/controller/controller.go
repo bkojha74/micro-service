@@ -3,8 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
 
+	"github.com/bkojha74/micro-service/auth-handler/helper"
 	"github.com/bkojha74/micro-service/auth-handler/models"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -43,7 +45,7 @@ func GenerateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(models.JwtKey)
+	tokenString, err := token.SignedString([]byte(helper.GetEnv("JWT_SECRET_KEY")))
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
@@ -51,4 +53,36 @@ func GenerateToken(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"token": tokenString})
+}
+
+// VerifyToken godoc
+// @Summary Verify a JWT token
+// @Description Verify the provided JWT token
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]string
+// @Failure 401 {string} string "Invalid token"
+// @Router /verify-token [post]
+// @Security BearerAuth
+func VerifyToken(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Authorization header is required", http.StatusUnauthorized)
+		return
+	}
+
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	claims := &models.Claims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(helper.GetEnv("JWT_SECRET_KEY")), nil
+	})
+
+	if err != nil || !token.Valid {
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{"message": "Token is valid", "username": claims.Username})
 }

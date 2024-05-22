@@ -2,11 +2,17 @@ package controller
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/bkojha74/micro-service/file-handler/models"
 )
 
 // SearchDirHandler godoc
@@ -19,6 +25,7 @@ import (
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /searchdir [get]
+// @Security BearerAuth
 func SearchDirHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Query().Get("path")
 	if path == "" {
@@ -55,6 +62,7 @@ func SearchDirHandler(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
 // @Router /file [post]
+// @Security BearerAuth
 func FileHandler(w http.ResponseWriter, r *http.Request) {
 	dirPath := r.URL.Query().Get("directory")
 	fileName := r.URL.Query().Get("filename")
@@ -163,4 +171,69 @@ func writeJSON(w http.ResponseWriter, v interface{}) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func VerifyToken(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Authorization header is required", http.StatusUnauthorized)
+			return
+		}
+
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+		resp := handleRequest(tokenString)
+		if resp.Err != nil {
+			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			return
+		}
+
+		// Store the username in the context
+		ctx := context.WithValue(r.Context(), models.ContextKeyUsername, resp.User)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func handleRequest(token string) models.AuthResponse {
+	Resp := models.AuthResponse{}
+
+	url := "http://localhost:8080/verify-token" // Replace with your target URL
+	method := "GET"                             // Change the method as needed
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		Resp.Err = err
+		return Resp
+	}
+
+	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		Resp.Err = err
+		return Resp
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		Resp.Err = err
+		return Resp
+	}
+
+	fmt.Println("Response:", string(body))
+
+	err = json.Unmarshal(body, &Resp)
+	if err != nil {
+		Resp.Err = err
+		return Resp
+	}
+
+	return Resp
 }

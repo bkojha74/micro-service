@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: file-handler-api
+    networks:
+      - my-network
+    ports:
+      - "8083:8083"
+
+networks:
+  my-network:
+    driver: bridge      
