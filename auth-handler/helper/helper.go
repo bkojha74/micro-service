@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -25,4 +26,8 @@ func LoadEnv() {
 
 func GetEnv(key string) string {
 	return os.Getenv(key)
+}
+
+func DecodeString(encodedStr string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(encodedStr)
 }

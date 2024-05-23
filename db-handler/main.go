@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -24,10 +23,8 @@ import (
 // @BasePath /
 func main() {
 	helper.Init()
-	fmt.Println("Helper Init done")
 
 	models.Init()
-	fmt.Println("Model Init done")
 
 	// Initialize the UserModel
 	userModel := &models.MongoUserModel{}

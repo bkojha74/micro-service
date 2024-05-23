@@ -1,7 +1,7 @@
 #docker build -t auth-app .
 #docker run -p 8081:8081 -d auth-app
 
-FROM golang:1.22.3-bullseye
+FROM golang:1.22.3-alpine
 
 WORKDIR /usr/src/app
 

@@ -198,8 +198,8 @@ func VerifyToken(next http.Handler) http.Handler {
 func handleRequest(token string) models.AuthResponse {
 	Resp := models.AuthResponse{}
 
-	url := "http://localhost:8080/verify-token" // Replace with your target URL
-	method := "GET"                             // Change the method as needed
+	url := "http://auth-handler:8081/verify-token"
+	method := "GET"
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)

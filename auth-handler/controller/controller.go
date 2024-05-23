@@ -2,6 +2,8 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -30,11 +32,13 @@ func GenerateToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate credentials (this is just an example, replace with actual validation)
-	if creds.Username != "user" || creds.Password != "pass" {
+	// validate the user and get corresponding secret key
+	resp := getUserInfo(creds.Username)
+	if resp.Err != nil {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 		return
 	}
+	fmt.Println("Got the Secret")
 
 	expirationTime := time.Now().Add(5 * time.Minute)
 	claims := &models.Claims{
@@ -45,7 +49,7 @@ func GenerateToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(helper.GetEnv("JWT_SECRET_KEY")))
+	tokenString, err := token.SignedString([]byte(resp.SecretKey))
 	if err != nil {
 		http.Error(w, "Error generating token", http.StatusInternalServerError)
 		return
@@ -85,4 +89,49 @@ func VerifyToken(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Token is valid", "username": claims.Username})
+}
+
+func getUserInfo(user string) models.UserwithError {
+	Resp := models.UserwithError{}
+
+	url := fmt.Sprintf("http://db-handler:8082/users/%s", user)
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		fmt.Println("Error creating request:", err)
+		Resp.Err = err
+		return Resp
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error making request:", err)
+		Resp.Err = err
+		return Resp
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		Resp.Err = err
+		return Resp
+	}
+
+	fmt.Println("Response:", string(body))
+
+	err = json.Unmarshal(body, &Resp)
+	if err != nil {
+		Resp.Err = err
+		return Resp
+	}
+
+	temp, _ := helper.DecodeString(Resp.SecretKey)
+	Resp.SecretKey = string(temp)
+
+	return Resp
 }
