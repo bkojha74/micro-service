@@ -2,6 +2,7 @@ package helper
 
 import (
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"os"
@@ -19,11 +20,19 @@ func Init() {
 	LoadEnv()
 }
 
-func HashPassword(password string) string {
+func HashString(password string) string {
 	hash := sha256.New()
 	hash.Write([]byte(password))
-	hashedPassword := hex.EncodeToString(hash.Sum(nil))
-	return hashedPassword
+	hashedString := hex.EncodeToString(hash.Sum(nil))
+	return hashedString
+}
+
+func EncodeString(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
+}
+
+func DecodeString(encodedStr string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(encodedStr)
 }
 
 func LoadEnv() {

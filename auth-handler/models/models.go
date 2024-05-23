@@ -15,3 +15,15 @@ type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type User struct {
+	Username  string `json:"username" bson:"username"`
+	Password  string `json:"password" bson:"password"`
+	SecretKey string `json:"secret" bson:"secret"`
+	Role      string `json:"role" bson:"role"`
+}
+
+type UserwithError struct {
+	User
+	Err error
+}

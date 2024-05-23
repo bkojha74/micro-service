@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bkojha74/micro-service/db-handler/helper"
 	"github.com/bkojha74/micro-service/db-handler/models"
 	"github.com/gorilla/mux"
 )
@@ -31,8 +30,6 @@ func (h *Handler) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
-	user.Password = helper.HashPassword(user.Password)
 
 	err := h.UserModel.CreateUser(user)
 	if err != nil {

@@ -13,8 +13,10 @@ import (
 )
 
 type User struct {
-	Username string `bson:"username"`
-	Password string `bson:"password"`
+	Username  string `json:"username" bson:"username"`
+	Password  string `json:"password" bson:"password"`
+	SecretKey string `json:"secret" bson:"secret"`
+	Role      string `json:"role" bson:"role"`
 }
 
 type UserModel interface {
@@ -40,12 +42,11 @@ func Init() {
 	fmt.Println("Database connected.\nReady to server APIs")
 }
 
-//var DefaultUserModel UserModel = &MongoUserModel{}
-
 type MongoUserModel struct{}
 
 func (m *MongoUserModel) CreateUser(user User) error {
-	user.Password = helper.HashPassword(user.Password)
+	user.Password = helper.HashString(user.Password)
+	user.SecretKey = helper.EncodeString(user.SecretKey)
 
 	_, err := helper.UserCollection.InsertOne(context.Background(), user)
 	if err != nil {
@@ -68,7 +69,7 @@ func (m *MongoUserModel) ReadUser(username string) (User, error) {
 
 func (m *MongoUserModel) UpdateUser(user User) error {
 	filter := bson.M{"username": user.Username}
-	update := bson.M{"$set": bson.M{"password": helper.HashPassword(user.Password)}}
+	update := bson.M{"$set": bson.M{"password": helper.HashString(user.Password)}}
 	_, err := helper.UserCollection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		log.Println("Error updating user:", err)
