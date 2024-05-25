@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'auth-handler'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['auth-handler:8081']
+
+  - job_name: 'db-handler'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['db-handler:8082']
+
+  - job_name: 'file-handler'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['file-handler:8083']
