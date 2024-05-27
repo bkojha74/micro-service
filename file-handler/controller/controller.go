@@ -183,7 +183,10 @@ func VerifyToken(next http.Handler) http.Handler {
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-		resp := handleRequest(tokenString)
+		// Get user name came in reqeust
+		user := r.URL.Query().Get("user")
+
+		resp := handleRequest(tokenString, user)
 		if resp.Err != nil {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
 			return
@@ -195,10 +198,10 @@ func VerifyToken(next http.Handler) http.Handler {
 	})
 }
 
-func handleRequest(token string) models.AuthResponse {
+func handleRequest(token, user string) models.AuthResponse {
 	Resp := models.AuthResponse{}
 
-	url := "http://auth-handler:8081/verify-token"
+	url := fmt.Sprintf("http://auth-handler:8081/verify-token?user=%s", user)
 	method := "GET"
 
 	client := &http.Client{}
@@ -236,4 +239,13 @@ func handleRequest(token string) models.AuthResponse {
 	}
 
 	return Resp
+}
+
+func ChainMiddleware(middlewares ...func(http.Handler) http.Handler) func(http.Handler) http.Handler {
+	return func(final http.Handler) http.Handler {
+		for i := len(middlewares) - 1; i >= 0; i-- {
+			final = middlewares[i](final)
+		}
+		return final
+	}
 }

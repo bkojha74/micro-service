@@ -75,11 +75,21 @@ func VerifyToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := r.URL.Query().Get("user")
+
+	// validate the user and get corresponding secret key
+	resp := getUserInfo(user)
+	if resp.Err != nil {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		return
+	}
+	fmt.Println("Got the Secret")
+
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	claims := &models.Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(helper.GetEnv("JWT_SECRET_KEY")), nil
+		return []byte(resp.SecretKey), nil
 	})
 
 	if err != nil || !token.Valid {

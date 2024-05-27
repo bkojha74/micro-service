@@ -12,7 +12,7 @@ import (
 
 // @title Database Management API
 // @version 1.0
-// @description This is a sample server for file management.
+// @description This is a sample server for database management.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support
