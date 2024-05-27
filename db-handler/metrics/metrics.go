@@ -10,22 +10,22 @@ import (
 var (
 	apiRequests = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "auth_requests_total",
-			Help: "Number of API requests",
+			Name: "db_requests_total",
+			Help: "Number of Database requests",
 		},
 		[]string{"service", "endpoint"},
 	)
 	apiRequestDuration = prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "auth_request_duration_seconds",
-			Help:    "Duration of API requests",
+			Name:    "db_request_duration_seconds",
+			Help:    "Duration of Database requests",
 			Buckets: prometheus.DefBuckets,
 		},
 		[]string{"service", "endpoint"},
 	)
 	memoryUsage = prometheus.NewGaugeFunc(
 		prometheus.GaugeOpts{
-			Name: "auth_memory_usage_bytes",
+			Name: "db_memory_usage_bytes",
 			Help: "Current memory usage in bytes",
 		},
 		func() float64 {

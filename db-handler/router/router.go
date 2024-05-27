@@ -1,9 +1,13 @@
 package router
 
 import (
+	"net/http"
+
 	"github.com/bkojha74/micro-service/db-handler/controller"
+	"github.com/bkojha74/micro-service/db-handler/metrics"
 	"github.com/bkojha74/micro-service/db-handler/models"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
@@ -15,13 +19,15 @@ func GetRouter(userModel models.UserModel) *mux.Router {
 	handler := &controller.Handler{UserModel: userModel}
 
 	// Crud handler
-	route.HandleFunc("/users", handler.CreateUserHandler).Methods("POST")
-	route.HandleFunc("/users/{username}", handler.ReadUserHandler).Methods("GET")
-	route.HandleFunc("/users", handler.UpdateUserHandler).Methods("PUT")
-	route.HandleFunc("/users/{username}", handler.DeleteUserHandler).Methods("DELETE")
+	route.Handle("/users", metrics.RecordMetrics("DB-Handler-Microservice", "CreateUserHandler", http.HandlerFunc(handler.CreateUserHandler))).Methods("POST")
+	route.Handle("/users/{username}", metrics.RecordMetrics("DB-Handler-Microservice", "ReadUserHandler", http.HandlerFunc(handler.ReadUserHandler))).Methods("GET")
+	route.Handle("/users", metrics.RecordMetrics("DB-Handler-Microservice", "UpdateUserHandler", http.HandlerFunc(handler.UpdateUserHandler))).Methods("PUT")
+	route.Handle("/users/{username}", metrics.RecordMetrics("DB-Handler-Microservice", "DeleteUserHandler", http.HandlerFunc(handler.DeleteUserHandler))).Methods("DELETE")
 
 	// Serve Swagger UI
 	route.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
+	route.Handle("/metrics", promhttp.Handler())
 
 	return route
 }

@@ -11,7 +11,7 @@ import (
 
 // @title Authentication Management API
 // @version 1.0
-// @description This is a sample server for file management.
+// @description This is a sample server for Authentication management.
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
