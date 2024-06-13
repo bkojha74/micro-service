@@ -2,13 +2,11 @@ package controller
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"net"
 
 	"github.com/bkojha74/micro-service/db-handler/models"
-
 	proto "github.com/bkojha74/micro-service/db-handler/protoc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,13 +18,15 @@ type Server struct {
 
 func (s *Server) GetUserInfo(ctx context.Context, in *proto.DBRequest) (*proto.DBResponse, error) {
 	fmt.Println("Request received to get User Info from auth-handler")
+
 	usr := models.MongoUserModel{}
 	usrInfo, err := usr.ReadUser(in.Username)
 	if err != nil {
-		return &proto.DBResponse{}, err
+		fmt.Printf("Error reading user info: %v\n", err)
+		return nil, err
 	}
 
-	fmt.Println("2. Got UserInfo", usrInfo)
+	fmt.Println("Got UserInfo:", usrInfo)
 
 	return &proto.DBResponse{
 		Username: usrInfo.Username,
@@ -35,7 +35,7 @@ func (s *Server) GetUserInfo(ctx context.Context, in *proto.DBRequest) (*proto.D
 			Secret:   usrInfo.SecretKey,
 			Role:     usrInfo.Role,
 		},
-	}, errors.New("")
+	}, nil
 }
 
 func StartGRPCServer() {
@@ -47,7 +47,7 @@ func StartGRPCServer() {
 	proto.RegisterExampleServer(srv, &Server{})
 	reflection.Register(srv)
 
-	log.Println("gRPC server is running on port 8084")
+	fmt.Println("gRPC server is running on port 8084")
 
 	if e := srv.Serve(listener); e != nil {
 		panic(e)
