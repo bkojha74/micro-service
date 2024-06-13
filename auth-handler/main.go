@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	_ "github.com/bkojha74/micro-service/auth-handler/docs"
 	"github.com/bkojha74/micro-service/auth-handler/helper"
+	proto "github.com/bkojha74/micro-service/auth-handler/protoc"
 	route "github.com/bkojha74/micro-service/auth-handler/router"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // @title Authentication Management API
@@ -25,6 +29,13 @@ import (
 // @BasePath /
 func main() {
 	helper.Init()
+
+	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Panic(err)
+	}
+	client := proto.NewExampleClient(conn)
+	client.GetUserInfo(context.TODO(), &proto.DBRequest{})
 
 	router := route.GetRouter()
 

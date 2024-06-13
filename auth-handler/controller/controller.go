@@ -3,12 +3,10 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strings"
 	"time"
 
-	"github.com/bkojha74/micro-service/auth-handler/helper"
 	"github.com/bkojha74/micro-service/auth-handler/models"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -26,12 +24,13 @@ import (
 // @Failure 500 {object} map[string]string
 // @Router /generate-token [post]
 func GenerateToken(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received request to Generate a Token")
 	var creds models.Credentials
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
+	fmt.Println("Correct request received to Generate a Token")
 	// validate the user and get corresponding secret key
 	resp := getUserInfo(creds.Username)
 	if resp.Err != nil {
@@ -101,7 +100,7 @@ func VerifyToken(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "Token is valid", "username": claims.Username})
 }
 
-func getUserInfo(user string) models.UserwithError {
+/*func getUserInfo(user string) models.UserwithError {
 	Resp := models.UserwithError{}
 
 	url := fmt.Sprintf("http://db-handler:8082/users/%s", user)
@@ -144,4 +143,4 @@ func getUserInfo(user string) models.UserwithError {
 	Resp.SecretKey = string(temp)
 
 	return Resp
-}
+}*/
