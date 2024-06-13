@@ -47,7 +47,7 @@ func getUserInfo(user string) models.UserwithError {
 		}
 	}
 
-	fmt.Printf("Received response from db-handler: %+v\n", res)
+	fmt.Println("Received response from db-handler:", res)
 
 	ret := models.UserwithError{
 		User: models.User{

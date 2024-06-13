@@ -230,7 +230,7 @@ func handleRequest(token, user string) models.AuthResponse {
 		return Resp
 	}
 
-	fmt.Println("Response:", string(body))
+	fmt.Printf("Response:%+v", string(body))
 
 	err = json.Unmarshal(body, &Resp)
 	if err != nil {

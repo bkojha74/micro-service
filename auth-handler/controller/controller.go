@@ -24,13 +24,13 @@ import (
 // @Failure 500 {object} map[string]string
 // @Router /generate-token [post]
 func GenerateToken(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Received request to Generate a Token")
+	fmt.Println("Received client request to Generate a Token")
 	var creds models.Credentials
 	if err := json.NewDecoder(r.Body).Decode(&creds); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	fmt.Println("Correct request received to Generate a Token")
+	fmt.Println("client data decoded successfully")
 	// validate the user and get corresponding secret key
 	resp := getUserInfo(creds.Username)
 	if resp.Err != nil {

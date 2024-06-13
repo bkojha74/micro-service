@@ -65,7 +65,7 @@ func (m *MongoUserModel) ReadUser(username string) (User, error) {
 		log.Println("Error reading user:", err)
 		return user, err
 	}
-	fmt.Println("1. Got UserInfo:", user)
+	fmt.Println("Got UserInfo:", user)
 	return user, nil
 }
 

@@ -17,7 +17,7 @@ type Server struct {
 }
 
 func (s *Server) GetUserInfo(ctx context.Context, in *proto.DBRequest) (*proto.DBResponse, error) {
-	fmt.Println("Request received to get User Info from auth-handler")
+	fmt.Println("gRPC request received to get User Info")
 
 	usr := models.MongoUserModel{}
 	usrInfo, err := usr.ReadUser(in.Username)
@@ -26,7 +26,7 @@ func (s *Server) GetUserInfo(ctx context.Context, in *proto.DBRequest) (*proto.D
 		return nil, err
 	}
 
-	fmt.Println("Got UserInfo:", usrInfo)
+	fmt.Println("gRPC response received for UserInfo:", usrInfo)
 
 	return &proto.DBResponse{
 		Username: usrInfo.Username,
