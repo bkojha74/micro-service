@@ -57,6 +57,7 @@ func (m *MongoUserModel) CreateUser(user User) error {
 }
 
 func (m *MongoUserModel) ReadUser(username string) (User, error) {
+	fmt.Println("Querying UserInfo for user:", username)
 	var user User
 	filter := bson.M{"username": username}
 	err := helper.UserCollection.FindOne(context.Background(), filter).Decode(&user)
@@ -64,6 +65,7 @@ func (m *MongoUserModel) ReadUser(username string) (User, error) {
 		log.Println("Error reading user:", err)
 		return user, err
 	}
+	fmt.Println("1. Got UserInfo:", user)
 	return user, nil
 }
 

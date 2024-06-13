@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/bkojha74/micro-service/db-handler/controller"
 	_ "github.com/bkojha74/micro-service/db-handler/docs"
 	"github.com/bkojha74/micro-service/db-handler/helper"
 	"github.com/bkojha74/micro-service/db-handler/models"
@@ -25,6 +26,8 @@ func main() {
 	helper.Init()
 
 	models.Init()
+
+	go controller.StartGRPCServer()
 
 	// Initialize the UserModel
 	userModel := &models.MongoUserModel{}
